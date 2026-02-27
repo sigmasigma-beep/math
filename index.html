@@ -25,9 +25,9 @@
           height: 100%;
           margin: 0;
           padding: 0;
-          background: #000E00;
+          background: #0F0019; 
           font-family: 'Kode Mono', monospace;
-          color: #39ff14;
+          color: #9F00FF; 
         }
         #app {
           max-width: 1000px;
@@ -37,15 +37,15 @@
         h1 {
           font-size: 3em;
           font-weight: normal;
-          color: #39ff14;
+          color: #9F00FF;
           text-align: center;
           padding: 0.5rem;
           margin-bottom: 2rem;
-          background: #003300;
-          border: 1px solid #39ff14;
+          background: #220033;
+          border: 1px solid #9F00FF;
         }
         p {
-          color: #39ff14;
+          color: #9F00FF;
           text-align: center;
         }
         #search-input {
@@ -54,16 +54,16 @@
           margin: 0 auto 1rem;
           font-size: 18px;
           padding: 10px;
-          border: 1px solid #39ff14;
-          background: #003000;
-          color: #39ff14;
+          border: 1px solid #9F00FF;
+          background: #220033;
+          color: #9F00FF;
         }
         #search-input::placeholder {
-          color: #66ff66;
+          color: #B366FF;
           font-style: italic;
         }
         #search-input:focus {
-          outline: 2px solid #39ff14;
+          outline: 2px solid #9F00FF;
         }
         #game-list {
           display: flex;
@@ -72,20 +72,19 @@
           justify-content: center;
         }
         #game-list button {
-          border: 1px solid #39ff14;
-          background: #003300;
-          padding: 8px;
+          border: 1px solid #9F00FF;
+          background: #220033;
+          padding: 12px 20px;
           box-sizing: border-box;
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          color: #39ff14;
+          color: #9F00FF;
           font-family: 'Kode Mono', monospace;
-          font-size: 14px;
+          font-size: 16px;
           cursor: pointer;
+          min-width: 220px;
         }
         #game-list button:hover {
-          background: #001a00;
+          background: #110022;
+          transform: scale(1.03);
         }
         #no-results {
           color: #888888;
@@ -106,40 +105,36 @@
 <body>
     <div id="app">
         <h1>Kyoshades Hub</h1>
-        <p>Click a game to play in fullscreen. Press Q + Z to exit back to the hub.</p>
+        <p>Click a game to play in fullscreen. Press Z + C to exit back to the hub. And Shushhhhhhh ^_____^ dont tell</p>
         
         <input type="text" id="search-input" placeholder="Search games...">
         
         <div id="game-list"></div>
-        <p id="no-results" style="display: none;">No games found.</p>
+        <p id="no-results" style="display: none;">Error 100</p>
         
-        <!-- Hidden iframe for loading games -->
+        
         <iframe id="game-frame" src="" style="display: none;"></iframe>
     </div>
     
     <script>
         let allGames = [
-            { name: "Bitlife", folder: "Res" },
-            { name: "AwesomeTanks2", folder: "awesometanks2" }
-            
-            
-            // Add more games here, e.g.: { name: "New Game", folder: "newgame" }
-        ]; // Hardcoded games list – edit this array to add/remove games
+            { name: "Bitlife", path: "Res/bitlife.html/index.html" },
+            { name: "AwesomeTanks2", path: "awesometanks2.html/index.html" }  
+        ];
         
-        let keysPressed = {}; // Track keys for Q + Z
+        let keysPressed = {};
 
-        // Render initial game list
+       
         renderGames(allGames);
 
-        // Add search listener
+ 
         const searchInput = document.getElementById('search-input');
         searchInput.addEventListener('keyup', handleSearch);
 
-        // Render game buttons
         function renderGames(games) {
             const gameList = document.getElementById('game-list');
             const noResults = document.getElementById('no-results');
-            gameList.innerHTML = ''; // Clear existing
+            gameList.innerHTML = '';
             
             if (games.length === 0) {
                 noResults.style.display = 'block';
@@ -148,23 +143,23 @@
                 games.forEach(game => {
                     const button = document.createElement('button');
                     button.textContent = `Play ${game.name}`;
-                    button.onclick = () => loadGame(game.folder);
+                    button.onclick = () => loadGame(game.path);
                     gameList.appendChild(button);
                 });
             }
         }
 
-        // Handle search filtering
+    
         function handleSearch(event) {
             const searchTerm = event.target.value.toLowerCase();
             const filteredGames = allGames.filter(game => game.name.toLowerCase().includes(searchTerm));
             renderGames(filteredGames);
         }
 
-        // Load game into iframe and fullscreen
-        function loadGame(gameFolder) {
+        
+        function loadGame(gamePath) {
             const iframe = document.getElementById('game-frame');
-            iframe.src = `${gameFolder}/index.html`;
+            iframe.src = gamePath;
             iframe.style.display = 'block';
             
             if (iframe.requestFullscreen) {
@@ -183,34 +178,34 @@
             document.addEventListener('msfullscreenchange', handleFullscreenChange);
         }
 
-        // Handle fullscreen exit
+        
         function handleFullscreenChange() {
             if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
                 resetGame();
             }
         }
 
-        // Reset iframe
+        
         function resetGame() {
             const iframe = document.getElementById('game-frame');
             iframe.src = '';
             iframe.style.display = 'none';
         }
 
-        // Keydown for Q + Z
+    
         document.addEventListener('keydown', (event) => {
             keysPressed[event.key.toLowerCase()] = true;
-            if (keysPressed['q'] && keysPressed['z']) {
+            if (keysPressed['z'] && keysPressed['c']) {
                 exitFullscreen();
             }
         });
 
-        // Keyup reset
+       
         document.addEventListener('keyup', (event) => {
             delete keysPressed[event.key.toLowerCase()];
         });
 
-        // Exit fullscreen
+        
         function exitFullscreen() {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
