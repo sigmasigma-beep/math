@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyoshades Hub</title>
+    <style>
+        @font-face {
+          font-family: 'Kode Mono';
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: ur[](https://fonts.gstatic.com/s/kodemono/v3/A2BLn5pb0QgtVEPFnlYkkaoBgw4qv9odq5myxDOZadW2.woff2) format('woff2');
+          unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+        }
+        @font-face {
+          font-family: 'Kode Mono';
+          font-style: normal;
+          font-weight: 400;
+          font-display: swap;
+          src: ur[](https://fonts.gstatic.com/s/kodemono/v3/A2BLn5pb0QgtVEPFnlYkkaoBgw4qv9odq5myxD2ZaQ.woff2) format('woff2');
+          unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        html, body {
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          background: #000E00;
+          font-family: 'Kode Mono', monospace;
+          color: #39ff14;
+        }
+        #app {
+          max-width: 1000px;
+          margin: auto;
+          padding: 2rem;
+        }
+        h1 {
+          font-size: 3em;
+          font-weight: normal;
+          color: #39ff14;
+          text-align: center;
+          padding: 0.5rem;
+          margin-bottom: 2rem;
+          background: #003300;
+          border: 1px solid #39ff14;
+        }
+        p {
+          color: #39ff14;
+          text-align: center;
+        }
+        #search-input {
+          display: block;
+          width: 300px;
+          margin: 0 auto 1rem;
+          font-size: 18px;
+          padding: 10px;
+          border: 1px solid #39ff14;
+          background: #003000;
+          color: #39ff14;
+        }
+        #search-input::placeholder {
+          color: #66ff66;
+          font-style: italic;
+        }
+        #search-input:focus {
+          outline: 2px solid #39ff14;
+        }
+        #game-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: center;
+        }
+        #game-list button {
+          border: 1px solid #39ff14;
+          background: #003300;
+          padding: 8px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          color: #39ff14;
+          font-family: 'Kode Mono', monospace;
+          font-size: 14px;
+          cursor: pointer;
+        }
+        #game-list button:hover {
+          background: #001a00;
+        }
+        #no-results {
+          color: #888888;
+          font-style: italic;
+          text-align: center;
+        }
+        #game-frame {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: none;
+          z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Kyoshades Hub</h1>
+        <p>Click a game to play in fullscreen. Press Q + Z to exit back to the hub.</p>
+        
+        <input type="text" id="search-input" placeholder="Search games...">
+        
+        <div id="game-list"></div>
+        <p id="no-results" style="display: none;">No games found.</p>
+        
+        <!-- Hidden iframe for loading games -->
+        <iframe id="game-frame" src="" style="display: none;"></iframe>
+    </div>
+    
+    <script>
+        let allGames = [
+            { name: "Run 3", file: "Run3.html" },
+            { name: "Another Game", file: "AnotherGame.html" }
+            // Add more games here, e.g.: { name: "New Game", file: "NewGame.html" }
+        ]; // Hardcoded games list – edit this array to add/remove games
+        
+        let keysPressed = {}; // Track keys for Q + Z
+
+        // Render initial game list
+        renderGames(allGames);
+
+        // Add search listener
+        const searchInput = document.getElementById('search-input');
+        searchInput.addEventListener('keyup', handleSearch);
+
+        // Render game buttons
+        function renderGames(games) {
+            const gameList = document.getElementById('game-list');
+            const noResults = document.getElementById('no-results');
+            gameList.innerHTML = ''; // Clear existing
+            
+            if (games.length === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+                games.forEach(game => {
+                    const button = document.createElement('button');
+                    button.textContent = `Play ${game.name}`;
+                    button.onclick = () => loadGame(game.file);
+                    gameList.appendChild(button);
+                });
+            }
+        }
+
+        // Handle search filtering
+        function handleSearch(event) {
+            const searchTerm = event.target.value.toLowerCase();
+            const filteredGames = allGames.filter(game => game.name.toLowerCase().includes(searchTerm));
+            renderGames(filteredGames);
+        }
+
+        // Load game into iframe and fullscreen
+        function loadGame(gameFile) {
+            const iframe = document.getElementById('game-frame');
+            iframe.src = `Res/${gameFile}`;
+            iframe.style.display = 'block';
+            
+            if (iframe.requestFullscreen) {
+                iframe.requestFullscreen();
+            } else if (iframe.mozRequestFullScreen) {
+                iframe.mozRequestFullScreen();
+            } else if (iframe.webkitRequestFullscreen) {
+                iframe.webkitRequestFullscreen();
+            } else if (iframe.msRequestFullscreen) {
+                iframe.msRequestFullscreen();
+            }
+            
+            document.addEventListener('fullscreenchange', handleFullscreenChange);
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+            document.addEventListener('msfullscreenchange', handleFullscreenChange);
+        }
+
+        // Handle fullscreen exit
+        function handleFullscreenChange() {
+            if (!document.fullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement && !document.msFullscreenElement) {
+                resetGame();
+            }
+        }
+
+        // Reset iframe
+        function resetGame() {
+            const iframe = document.getElementById('game-frame');
+            iframe.src = '';
+            iframe.style.display = 'none';
+        }
+
+        // Keydown for Q + Z
+        document.addEventListener('keydown', (event) => {
+            keysPressed[event.key.toLowerCase()] = true;
+            if (keysPressed['q'] && keysPressed['z']) {
+                exitFullscreen();
+            }
+        });
+
+        // Keyup reset
+        document.addEventListener('keyup', (event) => {
+            delete keysPressed[event.key.toLowerCase()];
+        });
+
+        // Exit fullscreen
+        function exitFullscreen() {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            resetGame();
+        }
+    </script>
+</body>
+</html>
