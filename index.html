@@ -26,13 +26,13 @@
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
+            overflow: hidden;
             background: #0F0019;
             font-family: 'Kode Mono', monospace;
             color: #9F00FF;
         }
 
-        /* Starry background */
+        
         body::before {
             content: "";
             position: fixed;
@@ -46,20 +46,47 @@
             background-size: 180px 180px, 140px 140px, 200px 200px, 160px 160px, 220px 220px;
             pointer-events: none;
             z-index: -2;
-            animation: twinkle 20s infinite alternate ease-in-out;
+            animation: twinkle 18s infinite alternate ease-in-out;
         }
 
         @keyframes twinkle {
-            0%, 100% { opacity: 0.4; }
-            50%      { opacity: 0.9; }
+            0%, 100% { opacity: 0.45; }
+            50%      { opacity: 0.85; }
+        }
+
+       
+        .shooting-star {
+            position: fixed;
+            width: 3px;
+            height: 60px;
+            background: linear-gradient(to bottom, transparent, #ffffffaa, #ffffff);
+            border-radius: 50% 50% 0 0;
+            pointer-events: none;
+            z-index: -1;
+            animation: fall linear infinite;
+            opacity: 0;
+            transform-origin: top center;
+        }
+
+        .shooting-star:nth-child(1) { left: 12%; animation-delay: 0s;    animation-duration: 8s; }
+        .shooting-star:nth-child(2) { left: 38%; animation-delay: 3s;   animation-duration: 10s; }
+        .shooting-star:nth-child(3) { left: 65%; animation-delay: 6s;   animation-duration: 12s; }
+        .shooting-star:nth-child(4) { left: 88%; animation-delay: 9s;   animation-duration: 9s; }
+
+        @keyframes fall {
+            0%   { transform: translateY(-100px) rotate(25deg); opacity: 0; }
+            10%  { opacity: 0.9; }
+            60%  { opacity: 0.7; }
+            100% { transform: translateY(120vh) rotate(25deg); opacity: 0; }
         }
 
         #app {
             max-width: 1200px;
             margin: auto;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
             position: relative;
             z-index: 1;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -67,11 +94,11 @@
             font-weight: normal;
             color: #9F00FF;
             text-align: center;
-            padding: 0.6rem;
+            padding: 0.7rem;
             margin-bottom: 2.5rem;
             background: rgba(34, 0, 51, 0.7);
             border: 2px solid #9F00FF;
-            border-radius: 8px;
+            border-radius: 0;               
             backdrop-filter: blur(4px);
         }
 
@@ -91,7 +118,7 @@
             border: 2px solid #9F00FF;
             background: #220033;
             color: #9F00FF;
-            border-radius: 6px;
+            border-radius: 0;               
             font-family: 'Kode Mono', monospace;
         }
 
@@ -102,7 +129,7 @@
 
         #search-input:focus {
             outline: none;
-            box-shadow: 0 0 12px #9F00FF80;
+            box-shadow: 0 0 10px #9F00FF60;
         }
 
         #game-list {
@@ -113,26 +140,26 @@
         }
 
         #game-list button {
-            flex: 0 0 22%;              /* ≈ 4 per row with gap */
+            flex: 0 0 22%;
             min-width: 240px;
             max-width: 280px;
-            padding: 24px 16px;
-            font-size: 1.4rem;
+            padding: 22px 16px;
+            font-size: 1.45rem;
             border: 2px solid #9F00FF;
             background: #220033;
             color: #D080FF;
             font-family: 'Kode Mono', monospace;
             cursor: pointer;
-            transition: all 0.15s ease;
-            border-radius: 8px;
-            box-shadow: 0 0 8px #4B008280;
+            transition: all 0.2s ease;
+            border-radius: 0;               
+            box-shadow: 0 0 6px #4B008240;
         }
 
         #game-list button:hover {
-            background: #330055;
-            transform: translateY(-4px) scale(1.04);
-            box-shadow: 0 12px 24px #9F00FF40;
-            border-color: #D080FF;
+            background: #2a0042;
+            box-shadow: 0 0 14px #9F00FF50;
+            border-color: #C070FF;
+            transform: scale(1.015);      
         }
 
         #no-results {
@@ -154,6 +181,13 @@
     </style>
 </head>
 <body>
+
+    <!-- Falling stars -->
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star"></div>
+
     <div id="app">
         <h1>Kyoshades Hub</h1>
         <p>Click a game to play in fullscreen. Press Z + C to exit back to the hub. And Shushhhhhhh ^_____^ dont tell</p>
@@ -167,10 +201,12 @@
     </div>
    
     <script>
+      ──────────
+
         let allGames = [
             { name: "Bitlife", path: "Res/bitlife.html/index.html" },
             { name: "AwesomeTanks2", path: "awesometanks2.html/index.html" },
-            // add more games here...
+            
         ];
        
         let keysPressed = {};
@@ -216,10 +252,10 @@
             else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
             else if (iframe.msRequestFullscreen) iframe.msRequestFullscreen();
            
-            document.addEventListener('fullscreenchange', handleFullscreenChange);
-            document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-            document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-            document.addEventListener('msfullscreenchange', handleFullscreenChange);
+            document.addEventListener('fullscreenchange', handleFullscreenChange, {once: true});
+            document.addEventListener('mozfullscreenchange', handleFullscreenChange, {once: true});
+            document.addEventListener('webkitfullscreenchange', handleFullscreenChange, {once: true});
+            document.addEventListener('msfullscreenchange', handleFullscreenChange, {once: true});
         }
        
         function handleFullscreenChange() {
