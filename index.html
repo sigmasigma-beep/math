@@ -119,9 +119,9 @@
     
     <script>
         let allGames = [
-            { name: "Run 3", file: "Run3.html" },
-            { name: "Another Game", file: "AnotherGame.html" }
-            // Add more games here, e.g.: { name: "New Game", file: "NewGame.html" }
+            { name: "Bitlife", folder: "bitlife" },
+            { name: "Run 3", folder: "run3" }
+            // Add more games here, e.g.: { name: "New Game", folder: "newgame" }
         ]; // Hardcoded games list – edit this array to add/remove games
         
         let keysPressed = {}; // Track keys for Q + Z
@@ -146,7 +146,7 @@
                 games.forEach(game => {
                     const button = document.createElement('button');
                     button.textContent = `Play ${game.name}`;
-                    button.onclick = () => loadGame(game.file);
+                    button.onclick = () => loadGame(game.folder);
                     gameList.appendChild(button);
                 });
             }
@@ -160,9 +160,9 @@
         }
 
         // Load game into iframe and fullscreen
-        function loadGame(gameFile) {
+        function loadGame(gameFolder) {
             const iframe = document.getElementById('game-frame');
-            iframe.src = `Res/${gameFile}`;
+            iframe.src = `${gameFolder}/index.html`;
             iframe.style.display = 'block';
             
             if (iframe.requestFullscreen) {
